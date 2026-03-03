@@ -191,7 +191,7 @@ export default function MathGame() {
                     </button>
                 </div>
             </div>
-        );
+        ); 
     }
 
     if (loading) {
