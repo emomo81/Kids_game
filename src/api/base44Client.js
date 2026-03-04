@@ -2,12 +2,21 @@ const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
 const getStorage = (key) => JSON.parse(localStorage.getItem(`mock_${key}`) || "[]");
 const setStorage = (key, data) => localStorage.setItem(`mock_${key}`, JSON.stringify(data));
+const getCurrentUserId = () => {
+    const user = localStorage.getItem("mock_current_user");
+    return user ? JSON.parse(user).id : null;
+};
 
 const createMockEntity = (entityName) => {
     return {
         list: async (sortBy = "", limit = 100) => {
             await delay(100);
+            const userId = getCurrentUserId();
             let data = getStorage(entityName);
+            if (userId) {
+                // Scope to current user for privacy
+                data = data.filter(item => item.user_id === userId || item.role === 'global');
+            }
             if (sortBy) {
                 let field = sortBy.startsWith("-") ? sortBy.slice(1) : sortBy;
                 let desc = sortBy.startsWith("-");
@@ -31,8 +40,14 @@ const createMockEntity = (entityName) => {
         },
         create: async (payload) => {
             await delay(200);
+            const userId = getCurrentUserId();
             const data = getStorage(entityName);
-            const newItem = { id: crypto.randomUUID(), created_date: new Date().toISOString(), ...payload };
+            const newItem = {
+                id: crypto.randomUUID(),
+                created_date: new Date().toISOString(),
+                user_id: userId,
+                ...payload
+            };
             data.push(newItem);
             setStorage(entityName, data);
             return newItem;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
+import { emailClient } from '@/api/emailClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { UserPlus, Star, AlertCircle } from 'lucide-react';
@@ -22,7 +23,15 @@ export default function Signup({ onSwitchToLogin }) {
         setLoading(true);
         const result = await signup(email, password, fullName);
         setLoading(false);
-        if (!result.success) {
+
+        if (result.success) {
+            // Send Welcome Email asynchronously
+            emailClient.sendEmail({
+                to_name: fullName,
+                to_email: email,
+                message: "Welcome to Math Adventure! We are so excited to have you join us. Get ready to solve problems, earn stars, and unlock awesome badges!",
+            }).catch(err => console.error("Failed to send welcome email:", err));
+        } else {
             setError(result.error || 'Failed to create account');
         }
     };
