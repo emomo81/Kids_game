@@ -27,13 +27,19 @@ export const AuthProvider = ({ children }) => {
         try {
             setIsLoadingAuth(true);
             const currentUser = await base44.auth.me();
-            setUser(currentUser);
-            setIsAuthenticated(true);
+            if (currentUser) {
+                setUser(currentUser);
+                setIsAuthenticated(true);
+            } else {
+                setUser(null);
+                setIsAuthenticated(false);
+            }
             setIsLoadingAuth(false);
         } catch (error) {
             console.error('User auth check failed:', error);
-            setIsLoadingAuth(false);
+            setUser(null);
             setIsAuthenticated(false);
+            setIsLoadingAuth(false);
         }
     };
 
@@ -41,6 +47,34 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setIsAuthenticated(false);
         base44.auth.logout();
+    };
+
+    const login = async (email, password) => {
+        setIsLoadingAuth(true);
+        try {
+            const userData = await base44.auth.login(email, password);
+            setUser(userData);
+            setIsAuthenticated(true);
+            setIsLoadingAuth(false);
+            return { success: true };
+        } catch (error) {
+            setIsLoadingAuth(false);
+            return { success: false, error: error.message };
+        }
+    };
+
+    const signup = async (email, password, fullName) => {
+        setIsLoadingAuth(true);
+        try {
+            const userData = await base44.auth.signup(email, password, fullName);
+            setUser(userData);
+            setIsAuthenticated(true);
+            setIsLoadingAuth(false);
+            return { success: true };
+        } catch (error) {
+            setIsLoadingAuth(false);
+            return { success: false, error: error.message };
+        }
     };
 
     const navigateToLogin = () => {
@@ -56,6 +90,8 @@ export const AuthProvider = ({ children }) => {
             authError,
             appPublicSettings,
             logout,
+            login,
+            signup,
             navigateToLogin,
             checkAppState
         }}>

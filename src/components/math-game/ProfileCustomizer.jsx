@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, Check, Moon, Sun } from "lucide-react";
+import { X, Upload, Check, Moon, Sun, LogOut } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ export default function ProfileCustomizer({ progress, progressId, onSave, onClos
     const [isDarkMode, setIsDarkMode] = useState(progress?.dark_mode || false);
     const [uploading, setUploading] = useState(false);
     const [saving, setSaving] = useState(false);
+    const { logout } = useAuth();
     const fileRef = useRef();
 
     const theme = getTheme(themeKey);
@@ -151,11 +153,17 @@ export default function ProfileCustomizer({ progress, progressId, onSave, onClos
                             </div>
                         </div>
 
-                        {/* Save */}
-                        <Button onClick={handleSave} disabled={saving}
-                            className={cn("w-full rounded-2xl font-bold h-11 text-white bg-gradient-to-r", theme.from, theme.to)}>
-                            {saving ? "Saving..." : "Save Profile"}
-                        </Button>
+                        {/* Actions */}
+                        <div className="flex gap-2 mt-4">
+                            <Button variant="outline" onClick={() => logout(true)}
+                                className="w-1/3 rounded-xl font-bold h-11 border-slate-200 text-slate-600 hover:bg-slate-100 flex items-center gap-2">
+                                <LogOut className="w-4 h-4" /> Exit
+                            </Button>
+                            <Button onClick={handleSave} disabled={saving}
+                                className={cn("w-2/3 rounded-xl font-bold h-11 text-white bg-gradient-to-r shadow-md", theme.from, theme.to)}>
+                                {saving ? "Saving..." : "Save Profile"}
+                            </Button>
+                        </div>
                     </div>
                 </motion.div>
             </motion.div>

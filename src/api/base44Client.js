@@ -64,11 +64,34 @@ export const base44 = {
             await delay(200);
             const user = localStorage.getItem("mock_current_user");
             if (user) return JSON.parse(user);
+            return null; // Return null instead of auto-creating to require login
+        },
+        login: async (email, password) => {
+            await delay(500);
+            const users = getStorage("Users");
+            const user = users.find(u => u.email === email && u.password === password);
+            if (!user) {
+                throw new Error("Invalid email or password");
+            }
+            // Create session
+            const sessionUser = { id: user.id, email: user.email, full_name: user.full_name };
+            localStorage.setItem("mock_current_user", JSON.stringify(sessionUser));
+            return sessionUser;
+        },
+        signup: async (email, password, fullName) => {
+            await delay(500);
+            const users = getStorage("Users");
+            if (users.find(u => u.email === email)) {
+                throw new Error("User with this email already exists");
+            }
+            const newUser = { id: `user_${Date.now()}`, email, password, full_name: fullName };
+            users.push(newUser);
+            setStorage("Users", users);
 
-            // Auto-create a mock user so the app behaves like you are signed in
-            const dummyUser = { email: "player@example.com", full_name: "Player 1", id: "user_1" };
-            localStorage.setItem("mock_current_user", JSON.stringify(dummyUser));
-            return dummyUser;
+            // Auto login after signup
+            const sessionUser = { id: newUser.id, email: newUser.email, full_name: newUser.full_name };
+            localStorage.setItem("mock_current_user", JSON.stringify(sessionUser));
+            return sessionUser;
         },
         logout: () => {
             localStorage.removeItem("mock_current_user");
