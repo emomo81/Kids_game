@@ -13,7 +13,11 @@ const createMockEntity = (entityName) => {
             await delay(100);
             const userId = getCurrentUserId();
             let data = getStorage(entityName);
-            if (userId) {
+
+            // Exempt global tables from strict user filtering
+            const globalEntities = ["LeaderboardEntry", "DailyChallenge"];
+
+            if (userId && !globalEntities.includes(entityName)) {
                 // Scope to current user for privacy
                 data = data.filter(item => item.user_id === userId || item.role === 'global');
             }
