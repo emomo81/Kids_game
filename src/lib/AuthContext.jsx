@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
             setIsAuthenticated(true);
             setIsLoadingAuth(false);
-            return { success: true };
+            return { success: true, user: userData };
         } catch (error) {
             setIsLoadingAuth(false);
             return { success: false, error: error.message };
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
             setIsAuthenticated(true);
             setIsLoadingAuth(false);
-            return { success: true };
+            return { success: true, user: userData };
         } catch (error) {
             setIsLoadingAuth(false);
             return { success: false, error: error.message };
