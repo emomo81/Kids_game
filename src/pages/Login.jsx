@@ -21,6 +21,7 @@ export default function Login({ onSwitchToSignup }) {
         setLoading(true);
         const result = await login(email, password);
         setLoading(false);
+
         if (!result.success) {
             setError(result.error || 'Failed to login');
         }
