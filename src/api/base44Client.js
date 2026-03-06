@@ -80,40 +80,53 @@ const createMockEntity = (entityName) => {
 export const base44 = {
     auth: {
         me: async () => {
-            await delay(200);
-            const user = localStorage.getItem("mock_current_user");
-            if (user) return JSON.parse(user);
-            return null; // Return null instead of auto-creating to require login
+            const token = localStorage.getItem("token");
+            if (!token) return null;
+            try {
+                const res = await fetch("http://localhost:5000/api/auth/me", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                if (!res.ok) {
+                    localStorage.removeItem("token");
+                    return null;
+                }
+                const data = await res.json();
+                return data.user;
+            } catch (err) {
+                console.error("Auth me error:", err);
+                return null;
+            }
         },
         login: async (email, password) => {
-            await delay(500);
-            const users = getStorage("Users");
-            const user = users.find(u => u.email === email && u.password === password);
-            if (!user) {
-                throw new Error("Invalid email or password");
+            const res = await fetch("http://localhost:5000/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || "Failed to login");
             }
-            // Create session
-            const sessionUser = { id: user.id, email: user.email, full_name: user.full_name };
-            localStorage.setItem("mock_current_user", JSON.stringify(sessionUser));
-            return sessionUser;
+            localStorage.setItem("token", data.token);
+            return data.user;
         },
         signup: async (email, password, fullName) => {
-            await delay(500);
-            const users = getStorage("Users");
-            if (users.find(u => u.email === email)) {
-                throw new Error("User with this email already exists");
+            const res = await fetch("http://localhost:5000/api/auth/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password, fullName })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || "Failed to signup");
             }
-            const newUser = { id: `user_${Date.now()}`, email, password, full_name: fullName };
-            users.push(newUser);
-            setStorage("Users", users);
-
-            // Auto login after signup
-            const sessionUser = { id: newUser.id, email: newUser.email, full_name: newUser.full_name };
-            localStorage.setItem("mock_current_user", JSON.stringify(sessionUser));
-            return sessionUser;
+            localStorage.setItem("token", data.token);
+            return data.user;
         },
         logout: () => {
-            localStorage.removeItem("mock_current_user");
+            localStorage.removeItem("token");
             window.location.reload();
         },
         redirectToLogin: () => {
