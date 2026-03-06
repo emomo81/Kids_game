@@ -29,6 +29,9 @@ export default function Signup({ onSwitchToLogin }) {
             emailClient.sendEmail({
                 to_name: fullName,
                 to_email: email,
+                user_email: email,
+                reply_to: email,
+                email: email,
                 message: "Welcome to Math Adventure! We are so excited to have you join us. Get ready to solve problems, earn stars, and unlock awesome badges!",
             }).catch(err => console.error("Failed to send welcome email:", err));
         } else {
