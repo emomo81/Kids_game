@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { emailClient } from '@/api/emailClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { UserPlus, Star, AlertCircle } from 'lucide-react';
+import { UserPlus, Star, AlertCircle, Eye, EyeOff, User, Lock, Mail } from 'lucide-react';
 
 export default function Signup({ onSwitchToLogin }) {
     const { signup } = useAuth();
@@ -12,6 +12,7 @@ export default function Signup({ onSwitchToLogin }) {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -40,78 +41,88 @@ export default function Signup({ onSwitchToLogin }) {
     };
 
     return (
-        <div className="w-full max-w-sm mx-auto bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20">
-            <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-amber-100 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
-                    <Star className="w-8 h-8 fill-current" />
-                </div>
-                <h1 className="text-2xl font-black text-slate-800 tracking-tight">Join the Fun!</h1>
-                <p className="text-slate-500 font-medium text-sm mt-1">Create your explorer account</p>
+        <div className="w-full max-w-md mx-auto relative pt-8">
+            {/* The Tab */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white/70 backdrop-blur-xl px-8 py-3 rounded-b-3xl shadow-lg z-20 flex justify-center items-center">
+                <h1 className="text-3xl font-medium text-slate-800 tracking-wide">Register</h1>
+                {/* Custom styling to merge tab into the card like the image */}
+                <div className="absolute top-0 -left-6 w-6 h-6 bg-transparent rounded-tr-3xl shadow-[5px_-5px_0_0_rgba(255,255,255,0.7)]" style={{ transform: 'scaleX(-1)' }}></div>
+                <div className="absolute top-0 -right-6 w-6 h-6 bg-transparent rounded-tl-3xl shadow-[-5px_-5px_0_0_rgba(255,255,255,0.7)]" style={{ transform: 'scaleX(-1)' }}></div>
             </div>
 
-            {error && (
-                <div className="mb-6 bg-rose-50 text-rose-600 text-sm p-3 rounded-xl border border-rose-100 flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <p className="font-medium">{error}</p>
-                </div>
-            )}
+            <div className="bg-white/10 backdrop-blur-md rounded-[2.5rem] p-10 pt-16 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/20 relative z-10">
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1 mb-1 block">Your Name</label>
-                    <Input
-                        type="text"
-                        placeholder="Explorer Alex"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all font-medium"
-                    />
-                </div>
-                <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1 mb-1 block">Email</label>
-                    <Input
-                        type="email"
-                        placeholder="alex@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all font-medium"
-                    />
-                </div>
-                <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1 mb-1 block">Secret Password</label>
-                    <Input
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all font-medium"
-                    />
-                </div>
+                {error && (
+                    <div className="mb-6 bg-rose-500/20 text-rose-200 text-sm p-3 rounded-2xl border border-rose-500/30 flex items-start gap-2 backdrop-blur-sm">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <p className="font-medium">{error}</p>
+                    </div>
+                )}
 
-                <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full h-12 mt-2 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
-                >
-                    {loading ? 'Creating account...' : (
-                        <span className="flex items-center justify-center gap-2">
-                            <UserPlus className="w-5 h-5" /> Start Adventure
-                        </span>
-                    )}
-                </Button>
-            </form>
+                <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+                    <div className="relative group">
+                        <Input
+                            type="text"
+                            placeholder="Full Name"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            className="w-full h-14 pl-6 pr-12 rounded-full bg-white/5 border border-white/40 text-white placeholder:text-white/70 focus:bg-white/10 focus:border-white/60 focus:ring-4 focus:ring-white/10 transition-all font-medium text-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+                        />
+                        <User className="absolute right-5 top-1/2 -translate-y-1/2 text-white w-5 h-5 opacity-80 group-focus-within:opacity-100 transition-opacity" />
+                    </div>
 
-            <div className="mt-6 text-center">
-                <p className="text-sm text-slate-500">
-                    Already playing?{' '}
-                    <button
-                        type="button"
-                        onClick={onSwitchToLogin}
-                        className="text-amber-600 font-bold hover:underline"
+                    <div className="relative group">
+                        <Input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full h-14 pl-6 pr-12 rounded-full bg-white/5 border border-white/40 text-white placeholder:text-white/70 focus:bg-white/10 focus:border-white/60 focus:ring-4 focus:ring-white/10 transition-all font-medium text-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+                        />
+                        <Mail className="absolute right-5 top-1/2 -translate-y-1/2 text-white w-5 h-5 opacity-80 group-focus-within:opacity-100 transition-opacity" />
+                    </div>
+
+                    <div className="relative group">
+                        <Input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full h-14 pl-6 pr-20 rounded-full bg-white/5 border border-white/40 text-white placeholder:text-white/70 focus:bg-white/10 focus:border-white/60 focus:ring-4 focus:ring-white/10 transition-all font-medium text-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+                        />
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="text-white opacity-60 hover:opacity-100 transition-opacity focus:outline-none"
+                            >
+                                {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                            </button>
+                            <Lock className="text-white w-5 h-5 opacity-80 group-focus-within:opacity-100 transition-opacity" />
+                        </div>
+                    </div>
+
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full h-14 mt-4 bg-white/90 hover:bg-white text-slate-800 font-bold text-lg rounded-full shadow-lg transition-all active:scale-95 duration-200"
                     >
-                        Log in here
-                    </button>
-                </p>
+                        {loading ? 'Creating account...' : 'Create Account'}
+                    </Button>
+                </form>
+
+                <div className="mt-8 text-center px-2">
+                    <p className="text-sm text-white/90 font-medium">
+                        Already playing?{' '}
+                        <button
+                            type="button"
+                            onClick={onSwitchToLogin}
+                            className="text-white font-bold hover:underline transition-all"
+                        >
+                            Log in here
+                        </button>
+                    </p>
+                </div>
             </div>
         </div>
     );
