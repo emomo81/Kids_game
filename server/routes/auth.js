@@ -1,9 +1,16 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 import User from '../models/User.js';
 
 const router = express.Router();
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { message: 'Too many login attempts, please try again after 15 minutes' }
+});
 
 router.post('/signup', async (req, res) => {
     try {
@@ -35,8 +42,14 @@ router.post('/signup', async (req, res) => {
             { expiresIn: '7d' }
         );
 
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
         res.status(201).json({
-            token,
             user: {
                 id: newUser._id,
                 email: newUser.email,
@@ -50,7 +63,7 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -74,8 +87,14 @@ router.post('/login', async (req, res) => {
             { expiresIn: '7d' }
         );
 
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
         res.status(200).json({
-            token,
             user: {
                 id: user._id,
                 email: user.email,
@@ -91,12 +110,11 @@ router.post('/login', async (req, res) => {
 
 router.get('/me', async (req, res) => {
     try {
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        const token = req.cookies.token;
+        if (!token) {
             return res.status(401).json({ message: 'Not authorized' });
         }
 
-        const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         const user = await User.findById(decoded.userId).select('-password');
@@ -116,6 +134,11 @@ router.get('/me', async (req, res) => {
         console.error('Me endpoint error:', error);
         res.status(401).json({ message: 'Token is invalid or expired' });
     }
+});
+
+router.post('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: 'Logged out successfully' });
 });
 
 export default router;
