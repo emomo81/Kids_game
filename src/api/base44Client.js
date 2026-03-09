@@ -100,30 +100,40 @@ export const base44 = {
             }
         },
         login: async (email, password) => {
-            const res = await fetch("http://localhost:5000/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data.message || "Failed to login");
+            try {
+                const res = await fetch("http://localhost:5000/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.message || "Failed to login");
+                }
+                localStorage.setItem("token", data.token);
+                return data.user;
+            } catch (err) {
+                // Return the error so UI can display it without logging a confusing red error in the console.
+                throw err;
             }
-            localStorage.setItem("token", data.token);
-            return data.user;
         },
         signup: async (email, password, fullName) => {
-            const res = await fetch("http://localhost:5000/api/auth/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password, fullName })
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data.message || "Failed to signup");
+            try {
+                const res = await fetch("http://localhost:5000/api/auth/signup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password, fullName })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.message || "Failed to signup");
+                }
+                localStorage.setItem("token", data.token);
+                return data.user;
+            } catch (err) {
+                // Return the error so UI can display it
+                throw err;
             }
-            localStorage.setItem("token", data.token);
-            return data.user;
         },
         logout: () => {
             localStorage.removeItem("token");
