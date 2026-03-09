@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogIn, Sparkles, AlertCircle } from 'lucide-react';
+import { LogIn, Sparkles, AlertCircle, Eye, EyeOff, User, Lock } from 'lucide-react';
 
 export default function Login({ onSwitchToSignup }) {
     const { login } = useAuth();
@@ -10,6 +10,8 @@ export default function Login({ onSwitchToSignup }) {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -28,68 +30,95 @@ export default function Login({ onSwitchToSignup }) {
     };
 
     return (
-        <div className="w-full max-w-sm mx-auto bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20">
-            <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
-                    <Sparkles className="w-8 h-8" />
-                </div>
-                <h1 className="text-2xl font-black text-slate-800 tracking-tight">Welcome Back!</h1>
-                <p className="text-slate-500 font-medium text-sm mt-1">Ready for another adventure?</p>
+        <div className="w-full max-w-md mx-auto relative pt-8">
+            {/* The Tab */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white/70 backdrop-blur-xl px-8 py-3 rounded-b-3xl shadow-lg z-20 flex justify-center items-center">
+                <h1 className="text-3xl font-medium text-slate-800 tracking-wide">Login</h1>
+                {/* Custom styling to merge tab into the card like the image */}
+                <div className="absolute top-0 -left-6 w-6 h-6 bg-transparent rounded-tr-3xl shadow-[5px_-5px_0_0_rgba(255,255,255,0.7)]" style={{ transform: 'scaleX(-1)' }}></div>
+                <div className="absolute top-0 -right-6 w-6 h-6 bg-transparent rounded-tl-3xl shadow-[-5px_-5px_0_0_rgba(255,255,255,0.7)]" style={{ transform: 'scaleX(-1)' }}></div>
             </div>
 
-            {error && (
-                <div className="mb-6 bg-rose-50 text-rose-600 text-sm p-3 rounded-xl border border-rose-100 flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <p className="font-medium">{error}</p>
-                </div>
-            )}
+            <div className="bg-white/10 backdrop-blur-md rounded-[2.5rem] p-10 pt-16 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/20 relative z-10">
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1 mb-1 block">Email</label>
-                    <Input
-                        type="email"
-                        placeholder="player@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-                    />
-                </div>
-                <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1 mb-1 block">Password</label>
-                    <Input
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-                    />
-                </div>
+                {error && (
+                    <div className="mb-6 bg-rose-500/20 text-rose-200 text-sm p-3 rounded-2xl border border-rose-500/30 flex items-start gap-2 backdrop-blur-sm">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <p className="font-medium">{error}</p>
+                    </div>
+                )}
 
-                <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full h-12 mt-2 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
-                >
-                    {loading ? 'Logging in...' : (
-                        <span className="flex items-center justify-center gap-2">
-                            <LogIn className="w-5 h-5" /> Let's Play!
-                        </span>
-                    )}
-                </Button>
-            </form>
+                <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+                    <div className="relative group">
+                        <Input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full h-14 pl-6 pr-12 rounded-full bg-white/5 border border-white/40 text-white placeholder:text-white/70 focus:bg-white/10 focus:border-white/60 focus:ring-4 focus:ring-white/10 transition-all font-medium text-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+                        />
+                        <User className="absolute right-5 top-1/2 -translate-y-1/2 text-white w-5 h-5 opacity-80 group-focus-within:opacity-100 transition-opacity" />
+                    </div>
 
-            <div className="mt-6 text-center">
-                <p className="text-sm text-slate-500">
-                    New here?{' '}
-                    <button
-                        type="button"
-                        onClick={onSwitchToSignup}
-                        className="text-indigo-600 font-bold hover:underline"
+                    <div className="relative group">
+                        <Input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full h-14 pl-6 pr-20 rounded-full bg-white/5 border border-white/40 text-white placeholder:text-white/70 focus:bg-white/10 focus:border-white/60 focus:ring-4 focus:ring-white/10 transition-all font-medium text-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+                        />
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="text-white opacity-60 hover:opacity-100 transition-opacity focus:outline-none"
+                            >
+                                {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                            </button>
+                            <Lock className="text-white w-5 h-5 opacity-80 group-focus-within:opacity-100 transition-opacity" />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-white/90 px-2 text-sm font-medium">
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                            <div className="relative flex items-center justify-center w-4 h-4 rounded border border-white/60 bg-white/10 group-hover:bg-white/20 transition-colors">
+                                <input
+                                    type="checkbox"
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                    className="absolute opacity-0 w-full h-full cursor-pointer"
+                                />
+                                {rememberMe && (
+                                    <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+                                )}
+                            </div>
+                            Remember me
+                        </label>
+                        <a href="#" className="hover:text-white hover:underline transition-all">Forgot Password?</a>
+                    </div>
+
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full h-14 mt-4 bg-white/90 hover:bg-white text-slate-800 font-bold text-lg rounded-full shadow-lg transition-all active:scale-95 duration-200"
                     >
-                        Create an account
-                    </button>
-                </p>
+                        {loading ? 'Logging in...' : 'Login'}
+                    </Button>
+                </form>
+
+                <div className="mt-8 text-center px-2">
+                    <p className="text-sm text-white/90 font-medium">
+                        Don't have an account?{' '}
+                        <button
+                            type="button"
+                            onClick={onSwitchToSignup}
+                            className="text-white font-bold hover:underline transition-all"
+                        >
+                            Register
+                        </button>
+                    </p>
+                </div>
             </div>
         </div>
     );
