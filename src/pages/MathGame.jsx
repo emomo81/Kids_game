@@ -296,7 +296,7 @@ export default function MathGame() {
                 <div className="pt-6 pb-6">
                     <div className="flex items-center justify-between mb-4">
                         <div className={`inline-flex items-center gap-2 bg-gradient-to-r ${theme.from} ${theme.to} text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg`}>
-                            <Sparkles className="w-4 h-4" /> Math Quest
+                             Math Quest
                         </div>
                         {/* Avatar + edit */}
                         <button onClick={() => setShowProfile(true)}
