@@ -12,6 +12,14 @@ const loginLimiter = rateLimit({
     message: { message: 'Too many login attempts, please try again after 15 minutes' }
 });
 
+// Cookie options for cross-domain (Vercel frontend + Render backend)
+const cookieOptions = {
+    httpOnly: true,
+    secure: true,        // required for sameSite: 'none'
+    sameSite: 'none',    // required for cross-domain cookies
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+};
+
 router.post('/signup', async (req, res) => {
     try {
         const { email, password, fullName } = req.body;
@@ -42,12 +50,7 @@ router.post('/signup', async (req, res) => {
             { expiresIn: '7d' }
         );
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        res.cookie('token', token, cookieOptions);
 
         res.status(201).json({
             user: {
@@ -87,12 +90,7 @@ router.post('/login', loginLimiter, async (req, res) => {
             { expiresIn: '7d' }
         );
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        res.cookie('token', token, cookieOptions);
 
         res.status(200).json({
             user: {
@@ -137,7 +135,7 @@ router.get('/me', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('token', cookieOptions);
     res.status(200).json({ message: 'Logged out successfully' });
 });
 

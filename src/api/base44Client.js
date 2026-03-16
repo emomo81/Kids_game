@@ -1,7 +1,9 @@
 const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
+const API_BASE = "https://kids-game-kaxz.onrender.com";
+
 const createRealEntity = (entityName) => {
-    const baseUrl = `http://localhost:5000/api/entities/${entityName}`;
+    const baseUrl = `${API_BASE}/api/entities/${entityName}`;
     return {
         list: async (sortBy = "", limit = 100) => {
             const query = new URLSearchParams();
@@ -56,7 +58,7 @@ export const base44 = {
     auth: {
         me: async () => {
             try {
-                const res = await fetch("http://localhost:5000/api/auth/me", {
+                const res = await fetch(`${API_BASE}/api/auth/me`, {
                     credentials: "include"
                 });
                 if (!res.ok) {
@@ -71,7 +73,7 @@ export const base44 = {
         },
         login: async (email, password) => {
             try {
-                const res = await fetch("http://localhost:5000/api/auth/login", {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, password }),
@@ -88,7 +90,7 @@ export const base44 = {
         },
         signup: async (email, password, fullName) => {
             try {
-                const res = await fetch("http://localhost:5000/api/auth/signup", {
+                const res = await fetch(`${API_BASE}/api/auth/signup`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, password, fullName }),
@@ -105,7 +107,7 @@ export const base44 = {
         },
         logout: async () => {
             try {
-                await fetch("http://localhost:5000/api/auth/logout", {
+                await fetch(`${API_BASE}/api/auth/logout`, {
                     method: "POST",
                     credentials: "include"
                 });
