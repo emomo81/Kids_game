@@ -9,6 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import AuthPage from '@/pages/AuthPage';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -73,6 +74,7 @@ function App() {
         </Router>
         <Toaster />
         <Analytics />
+        <SpeedInsights />
       </QueryClientProvider>
     </AuthProvider>
   )
