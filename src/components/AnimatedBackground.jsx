@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 
 const TOTAL_FRAMES = 240;
 const FRAME_PREFIX = "/backgrounds/ezgif-frame-";
-const FPS = 24; // Frames per second for the animation
 
 export default function AnimatedBackground() {
     const [currentFrame, setCurrentFrame] = useState(1);
@@ -14,21 +13,40 @@ export default function AnimatedBackground() {
     };
 
     useEffect(() => {
-        // Preload a few upcoming frames to prevent flickering
-        const preloadFrames = () => {
-            for (let i = 1; i <= Math.min(20, TOTAL_FRAMES); i++) {
-                const img = new Image();
-                img.src = getFramePath(i);
-            }
+        let isMounted = true;
+
+        const loadNextFrame = (frameNo) => {
+            if (!isMounted) return;
+            
+            const nextFrame = (frameNo % TOTAL_FRAMES) + 1;
+            const img = new Image();
+            
+            // Wait for the image to fully download before showing it
+            img.onload = () => {
+                if (!isMounted) return;
+                setCurrentFrame(nextFrame);
+                
+                // Add a tiny artificial delay to match your ~24 FPS
+                setTimeout(() => {
+                    loadNextFrame(nextFrame);
+                }, 41); 
+            };
+            
+            // If the image fails to load, just skip to the next one
+            img.onerror = () => {
+                if (isMounted) setTimeout(() => loadNextFrame(nextFrame), 41);
+            };
+
+            // Using Request ID or similar might be cleaner, but simple image fetch works.
+            img.src = getFramePath(nextFrame);
         };
-        preloadFrames();
 
-        // Set up the animation interval
-        const interval = setInterval(() => {
-            setCurrentFrame((prev) => (prev % TOTAL_FRAMES) + 1);
-        }, 1000 / FPS);
+        // Start the loop
+        loadNextFrame(1);
 
-        return () => clearInterval(interval);
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     return (
